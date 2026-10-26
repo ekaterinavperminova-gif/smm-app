@@ -199,6 +199,7 @@ function vAnalytics(d){
   var h2=el('h2',null,'Во',app);el('em',null,'ронки',h2);h2.textContent='';h2.appendChild(document.createTextNode('Во'));h2.appendChild(el('em',null,'ронки'));
   var fs=a.funnels||[];
   if(!fs.length){el('div','card empty','Воронок пока нет',app);return}
+  summary(app,fs);
   var live=[],dead=[];
   fs.forEach(function(f){var any=(f.stages||[]).some(function(s){return s.count>0});(any?live:dead).push(f)});
   live.forEach(function(f){funnel(app,f)});
@@ -209,6 +210,35 @@ function vAnalytics(d){
   }
 }
 function plural(n,f){var m=n%10,h=n%100;if(m===1&&h!==11)return f[0];if(m>=2&&m<=4&&(h<10||h>=20))return f[1];return f[2]}
+function summary(p,fs){
+  var byNo={};
+  fs.forEach(function(f){
+    (f.stages||[]).forEach(function(s){
+      var k=s.no;byNo[k]=byNo[k]||{stage:s.stage,total:0};byNo[k].total+=(s.count||0);
+    });
+  });
+  var nos=Object.keys(byNo).map(Number).sort(function(a,b){return a-b});
+  if(!nos.length)return;
+  var c=el('div','card',null,p);
+  el('div','lbl','Всего по всем воронкам',c);
+  var row=el('div','row',null,c);row.style.marginTop='10px';row.style.gap='22px';
+  nos.forEach(function(no,i){
+    var cell=el('div',null,null,row);cell.style.flex='1';cell.style.minWidth='80px';
+    el('div','mid',num(byNo[no].total),cell);
+    el('div','muted',txt(byNo[no].stage),cell).style.marginTop='2px';
+    if(i<nos.length-1){
+      var arrCell=el('div',null,'→',row);
+      arrCell.style.cssText='color:var(--gold);font-family:"Playfair Display",Georgia,serif;font-size:22px;align-self:center;flex:0 0 auto';
+    }
+  });
+  var first=byNo[nos[0]].total,last=byNo[nos[nos.length-1]].total;
+  var conv=(first>0)?Math.round(last/first*1000)/10:null;
+  var bar=el('div','bar',null,c);
+  el('span',null,'',bar).style.cssText='display:block;height:100%;background:var(--gold);border-radius:3px;width:'+(conv===null?0:Math.min(conv,100))+'%';
+  var br=el('div','row',null,c);br.style.cssText='align-items:baseline;margin-top:4px';
+  el('span','pct',conv===null?'-':num(conv,1)+'%',br);
+  el('span','muted','доходят от первого шага до последнего, '+fs.length+' '+plural(fs.length,['воронка','воронки','воронок']),br);
+}
 function funnel(p,f){
   var c=el('div','card',null,p);
   el('div','lbl',txt(f.group),c);
