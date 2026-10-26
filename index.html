@@ -304,14 +304,15 @@ function vBudget(d){
   var k=el('div','card',null,app);
   kv(k,'Лимит на один ролик',num(b.limit_per_reel));
   kv(k,'Потрачено (журнал бота)',num(b.spent_total)+(isNum(m.spent_total_rub)?' · '+num(m.spent_total_rub)+' ₽':''));
-  if(isNum(m.rub_per_credit))kv(k,'Курс',num(m.rub_per_credit,2)+' ₽/кредит (тариф Creator, курс '+num(m.rub_per_usd,2)+' ₽/$)');
+  if(isNum(m.rub_per_credit))kv(k,'Курс',num(m.rub_per_credit,2)+' ₽/кредит (счёт ÷ кредиты по журналу кабинета, курс '+num(m.rub_per_usd,2)+' ₽/$)');
   if(isNum(m.total_usd)){
     var mc=el('div','card dark',null,app);
-    el('div','lbl','Всего на HeyGen '+txt(m.total_window),mc);
+    el('div','lbl','Всего на HeyGen - '+txt(m.total_window),mc);
     var mr=el('div','row',null,mc);mr.style.cssText='align-items:baseline;gap:14px;margin-top:6px';
     el('div','mid','$'+num(m.total_usd,2),mr);
     el('div','muted',isNum(m.total_rub)?'≈ '+num(m.total_rub)+' ₽':'',mr);
-    el('div','note muted','Эта сумма - со слов Кати, не из журнала бота (его данные с 01.10)',mc);
+    if(isNum(m.total_credits_all_time))el('div','muted',num(m.total_credits_all_time)+' кредитов по журналу кабинета',mc).style.marginTop='4px';
+    el('div','note muted','Сумма в $ - со слов Кати, кредиты - из журнала кабинета',mc);
   }
   var h=el('h2',null,'Куда ',app);h.appendChild(el('em',null,'ушли'));
   var t=el('div','card',null,app);
